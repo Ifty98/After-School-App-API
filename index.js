@@ -1,6 +1,5 @@
-// index.js
 const express = require('express');
-const { connectToDatabase, getDb } = require('./db'); // Adjust the path accordingly
+const { connectToDatabase, getDb } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,11 +7,10 @@ const PORT = process.env.PORT || 3000;
 // Connect to MongoDB
 connectToDatabase();
 
-app.get('/', async (req, res) => {
+app.get('/lessons', async (req, res) => {
   try {
     const db = getDb();
     
-    // Perform MongoDB operations here
     const result = await db.collection('lessons').find({}).toArray();
 
     res.json(result);
