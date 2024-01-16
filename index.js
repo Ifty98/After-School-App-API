@@ -1,25 +1,27 @@
+// index.js
 const express = require('express');
-const mongoose = require('mongoose');
+const { connectToDatabase, getDb } = require('./db'); // Adjust the path accordingly
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const mongoURI = 'mongodb+srv://ifty98:Iftynumber2@user1.spl3a5v.mongodb.net/';
-
 // Connect to MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-  })
-  .catch(err => {
-    console.error('Error connecting to MongoDB Atlas', err);
-  });
+connectToDatabase();
 
-// Define a simple route
-app.get('/', (req, res) => {
-  res.send('Hello, MongoDB Atlas!');
+app.get('/', async (req, res) => {
+  try {
+    const db = getDb();
+    
+    // Perform MongoDB operations here
+    const result = await db.collection('lessons').find({}).toArray();
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error handling request:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
