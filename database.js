@@ -1,5 +1,3 @@
-// db.js
-
 const { MongoClient } = require('mongodb');
 
 const url = 'mongodb+srv://ifty98:Iftynumber2@user1.spl3a5v.mongodb.net/';
