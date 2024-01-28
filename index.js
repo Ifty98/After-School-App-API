@@ -39,6 +39,7 @@ app.get('/lessons', async (req, res) => {
     res.json(result);
   } catch (error) {
     //handle error
+    console.error('Error:', error);
     res.status(500).json({ error: 'Server Error' });
   }
 });
