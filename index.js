@@ -72,22 +72,32 @@ async function startServer() {
     app.put('/lessons/updateSpaces', async (req, res) => {
       try {
         const db = getDb();
-        //get the array of IDs from the request body
         const { lessonIDs } = req.body;
-
-        //convert lesson IDs to ObjectIds
-        const lessonObjectIds = lessonIDs.map(id => new ObjectId(id));
-
-        //update the number of spaces for each lesson ID in the array
-        const result = await db.collection('lessons').updateMany(
-          { _id: { $in: lessonObjectIds } },
-          { $inc: { space: -1 } } //decrease the number of spaces by 1
-        );
-
+    
+        // Count occurrences of each lesson ID in the array
+        const lessonIDCounts = {};
+        lessonIDs.forEach(id => {
+          lessonIDCounts[id] = (lessonIDCounts[id] || 0) + 1;
+        });
+    
+        const bulkOps = [];
+    
+        // Iterate through unique lesson IDs
+        Object.keys(lessonIDCounts).forEach(async id => {
+          // Update the number of spaces for each lesson ID
+          const updateSpaces = lessonIDCounts[id];
+          const result = await db.collection('lessons').updateMany(
+            { _id: ObjectId(id) },
+            { $inc: { space: -updateSpaces } }
+          );
+    
+          bulkOps.push(result);
+        });
+    
         res.json({ message: 'Number of available spaces updated successfully.' });
       } catch (error) {
         res.status(500).json({ error: 'Server Error' });
-        //handle error
+        // Handle error
       }
     });
 
