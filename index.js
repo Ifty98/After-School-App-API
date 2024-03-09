@@ -74,25 +74,16 @@ async function startServer() {
         const db = getDb();
         const { lessonIDs } = req.body;
     
-        // Count occurrences of each lesson ID in the array
-        const lessonIDCounts = {};
-        lessonIDs.forEach(id => {
-          lessonIDCounts[id] = (lessonIDCounts[id] || 0) + 1;
-        });
-    
-        const bulkOps = [];
-    
-        // Iterate through unique lesson IDs
-        await Promise.all(Object.keys(lessonIDCounts).map(async id => {
+        // Iterate through lesson IDs
+        for (const lessonID of lessonIDs) {
           // Update the number of spaces for each lesson ID
-          const updateSpaces = lessonIDCounts[id];
-          const result = await db.collection('lessons').updateMany(
-            { _id: ObjectId(id) },
-            { $inc: { space: -updateSpaces } }
+          const result = await db.collection('lessons').updateOne(
+            { _id: ObjectId(lessonID) },
+            { $inc: { space: -1 } }
           );
     
-          bulkOps.push(result);
-        }));
+          // Handle result if needed
+        }
     
         res.json({ message: 'Number of available spaces updated successfully.' });
       } catch (error) {
