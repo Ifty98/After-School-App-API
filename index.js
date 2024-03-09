@@ -74,22 +74,26 @@ async function startServer() {
         const db = getDb();
         //get the array of IDs from the request body
         const { lessonIDs } = req.body;
-
+    
         //convert lesson IDs to ObjectIds
         const lessonObjectIds = lessonIDs.map(id => new ObjectId(id));
-
-        //update the number of spaces for each lesson ID in the array
-        const result = await db.collection('lessons').updateOne(
-          { _id: { $in: lessonObjectIds } },
-          { $inc: { space: -1 } } //decrease the number of spaces by 1
-        );
-
+    
+        // Iterate through each lesson ID in the array
+        for (const lessonID of lessonObjectIds) {
+          // Update the number of spaces for each lesson ID individually
+          const result = await db.collection('lessons').updateOne(
+            { _id: lessonID },
+            { $inc: { space: -1 } } //decrease the number of spaces by 1
+          );
+        }
+    
         res.json({ message: 'Number of available spaces updated successfully.' });
       } catch (error) {
+        console.error('Error updating spaces:', error);
         res.status(500).json({ error: 'Server Error' });
-        //handle error
       }
     });
+    
 
     //get request to retrieve all the lessons searched by the user
     app.get('/lessons/search', async (req, res) => {
