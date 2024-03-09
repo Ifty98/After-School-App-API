@@ -79,7 +79,7 @@ async function startServer() {
         const lessonObjectIds = lessonIDs.map(id => new ObjectId(id));
 
         //update the number of spaces for each lesson ID in the array
-        const result = await db.collection('lessons').updateMany(
+        const result = await db.collection('lessons').updateOne(
           { _id: { $in: lessonObjectIds } },
           { $inc: { space: -1 } } //decrease the number of spaces by 1
         );
